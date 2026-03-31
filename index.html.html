@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>SVY21 Coordinator</title>
+<style>
+  :root {
+    --primary: #1565C0;
+    --primary-dark: #0D47A1;
+    --primary-light: #42A5F5;
+    --accent: #FF6F00;
+    --bg: #F5F5F5;
+    --card: #FFFFFF;
+    --text: #212121;
+    --text2: #757575;
+    --green: #4CAF50;
+    --red: #F44336;
+    --border: #E0E0E0;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    padding-bottom: 80px;
+  }
+
+  /* Header */
+  .header {
+    background: var(--primary);
+    color: white;
+    padding: 16px 20px;
+    font-size: 20px;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    background: var(--primary-dark);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tab {
+    flex: 1;
+    padding: 12px 8px;
+    text-align: center;
+    color: rgba(255,255,255,0.7);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    color: white;
+    border-bottom-color: var(--accent);
+  }
+
+  /* Pages */
+  .page { display: none; padding: 16px; }
+  .page.active { display: block; }
+
+  /* Cards */
+  .card {
+    background: var(--card);
+    border-radius: 12px;
+    padding: 20px;
+    margin-bottom: 12px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+  }
+  .card-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .card-title.secondary {
+    font-size: 16px;
+    color: var(--text2);
+  }
+
+  /* GPS status */
+  .status-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .status-dot {
+    width: 12px; height: 12px;
+    border-radius: 50%;
+    background: var(--red);
+    flex-shrink: 0;
+  }
+  .status-dot.active { background: var(--green); animation: pulse 2s infinite; }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+  }
+  .status-text { flex: 1; font-size: 14px; color: var(--text2); }
+  .accuracy-text { font-size: 13px; color: var(--text2); }
+
+  /* Coordinate display */
+  .coord-label {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 2px;
+  }
+  .coord-value {
+    font-size: 26px;
+    font-weight: 700;
+    font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+    color: var(--text);
+    margin-bottom: 14px;
+    word-break: break-all;
+  }
+  .coord-value.small {
+    font-size: 16px;
+    font-weight: 400;
+  }
+  .wgs84-row {
+    display: flex;
+    gap: 16px;
+  }
+  .wgs84-row > div { flex: 1; }
+
+  /* Buttons */
+  .btn-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+  }
+  .btn {
+    flex: 1;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    transition: all 0.15s;
+    -webkit-tap-highlight-color: transparent;
+  }
+  .btn:active { transform: scale(0.97); }
+  .btn-primary {
+    background: var(--primary);
+    color: white;
+  }
+  .btn-accent {
+    background: var(--accent);
+    color: white;
+  }
+  .btn-outline {
+    background: white;
+    color: var(--primary);
+    border: 2px solid var(--primary);
+  }
+  .btn-text {
+    background: transparent;
+    color: var(--primary);
+  }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+
+  /* Input fields */
+  .input-group {
+    margin-bottom: 14px;
+  }
+  .input-group label {
+    display: block;
+    font-size: 13px;
+    color: var(--text2);
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+  .input-group input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 18px;
+    font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+    outline: none;
+    transition: border-color 0.2s;
+    -webkit-appearance: none;
+  }
+  .input-group input:focus {
+    border-color: var(--primary);
+  }
+  .input-suffix {
+    position: relative;
+  }
+  .input-suffix::after {
+    content: 'm';
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--text2);
+    font-size: 16px;
+    pointer-events: none;
+  }
+
+  /* Preview box */
+  .preview-box {
+    background: #E8F5E9;
+    border-radius: 8px;
+    padding: 12px;
+    margin-bottom: 16px;
+    display: none;
+  }
+  .preview-box.visible { display: block; }
+  .preview-label {
+    font-size: 11px;
+    color: var(--text2);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .preview-value {
+    font-size: 15px;
+    font-family: 'SF Mono', 'Menlo', 'Courier New', monospace;
+    color: var(--text);
+    margin-top: 4px;
+  }
+
+  /* Reference box */
+  .ref-box {
+    background: #FFF8E1;
+    border-radius: 8px;
+    padding: 12px;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+  .ref-box strong { color: var(--text); }
+
+  /* History list */
+  .history-item {
+    display: flex;
+    align-items: center;
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .history-item:active { background: #E3F2FD; }
+  .history-item:last-child { border-bottom: none; }
+  .history-num {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .history-coords {
+    flex: 1;
+    min-width: 0;
+  }
+  .history-svy21 {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: monospace;
+    color: var(--text);
+  }
+  .history-wgs84 {
+    font-size: 11px;
+    font-family: monospace;
+    color: var(--text2);
+  }
+  .history-time {
+    font-size: 11px;
+    color: var(--text2);
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .history-actions {
+    display: flex;
+    gap: 4px;
+    flex-shrink: 0;
+  }
+  .history-actions button {
+    background: none;
+    border: none;
+    font-size: 18px;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 4px;
+  }
+  .history-actions button:active { background: #E0E0E0; }
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text2);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* Toast */
+  .toast {
+    position: fixed;
+    bottom: 90px;
+    left: 50%;
+    transform: translateX(-50%) translateY(100px);
+    background: #333;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    z-index: 200;
+    opacity: 0;
+    transition: all 0.3s;
+    white-space: nowrap;
+    max-width: 90vw;
+    text-align: center;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<div class="header">SVY21 Coordinator</div>
+
+<div class="tabs">
+  <div class="tab active" data-page="live">Live GPS</div>
+  <div class="tab" data-page="goto">Go To Location</div>
+  <div class="tab" data-page="history">History</div>
+</div>
+
+<!-- ===== LIVE GPS PAGE ===== -->
+<div class="page active" id="page-live">
+
+  <!-- GPS Status -->
+  <div class="card">
+    <div class="status-row">
+      <div class="status-dot" id="gpsDot"></div>
+      <span class="status-text" id="gpsStatus">Waiting for GPS signal…</span>
+      <span class="accuracy-text" id="gpsAccuracy"></span>
+    </div>
+  </div>
+
+  <!-- SVY21 Coordinates -->
+  <div class="card">
+    <div class="card-title">SVY21 Coordinates</div>
+    <div class="coord-label">NORTHING (N)</div>
+    <div class="coord-value" id="liveNorthing">—</div>
+    <div class="coord-label">EASTING (E)</div>
+    <div class="coord-value" id="liveEasting">—</div>
+  </div>
+
+  <!-- WGS84 -->
+  <div class="card">
+    <div class="card-title secondary">WGS84 Coordinates</div>
+    <div class="wgs84-row">
+      <div>
+        <div class="coord-label">LATITUDE</div>
+        <div class="coord-value small" id="liveLat">—</div>
+      </div>
+      <div>
+        <div class="coord-label">LONGITUDE</div>
+        <div class="coord-value small" id="liveLon">—</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="btn-row">
+    <button class="btn btn-primary" id="btnSave" disabled>Save Point</button>
+    <button class="btn btn-outline" id="btnCopy" disabled>Copy</button>
+  </div>
+  <div class="btn-row">
+    <button class="btn btn-outline" id="btnShare" disabled>Share</button>
+    <button class="btn btn-accent" id="btnMapCurrent" disabled>Open in Maps</button>
+  </div>
+</div>
+
+<!-- ===== GO TO LOCATION PAGE ===== -->
+<div class="page" id="page-goto">
+
+  <div class="card">
+    <div class="card-title">Enter SVY21 Coordinates</div>
+
+    <div class="input-group">
+      <label>Northing (N)</label>
+      <div class="input-suffix">
+        <input type="text" inputmode="decimal" id="inputN" placeholder="e.g. 30000.000">
+      </div>
+    </div>
+
+    <div class="input-group">
+      <label>Easting (E)</label>
+      <div class="input-suffix">
+        <input type="text" inputmode="decimal" id="inputE" placeholder="e.g. 28000.000">
+      </div>
+    </div>
+
+    <div class="preview-box" id="gotoPreview">
+      <div class="preview-label">CONVERTED WGS84</div>
+      <div class="preview-value" id="gotoPreviewText"></div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-outline" id="btnPreview">Preview</button>
+      <button class="btn btn-accent" id="btnOpenMap">Open in Maps</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title secondary">Or Import from History</div>
+    <button class="btn btn-outline" id="btnImportHistory" style="width:100%">Select from Saved Points</button>
+  </div>
+
+  <div class="card">
+    <div class="ref-box">
+      <strong>SVY21 Quick Reference</strong><br>
+      Northing range: ~8,000 – 50,000 m<br>
+      Easting range: ~16,000 – 50,000 m<br><br>
+      <strong>Example (Marina Bay Sands):</strong><br>
+      N: 29,837 &nbsp; E: 29,974
+    </div>
+  </div>
+</div>
+
+<!-- ===== HISTORY PAGE ===== -->
+<div class="page" id="page-history">
+  <div class="card" style="padding:0; overflow:hidden;">
+    <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px;">
+      <div class="card-title" style="margin:0;">Saved Points</div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn btn-text" id="btnExportCsv" style="flex:none; font-size:13px; padding:6px 12px;">Export CSV</button>
+        <button class="btn btn-text" id="btnClearHistory" style="flex:none; font-size:13px; padding:6px 12px; color:var(--red);">Clear</button>
+      </div>
+    </div>
+    <div id="historyList"></div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ========================================
+// SVY21 Conversion Library
+// ========================================
+const SVY21 = (() => {
+  const a = 6378137.0;
+  const f = 1 / 298.257223563;
+  const oLat = 1.366666666666667;
+  const oLon = 103.833333333333333;
+  const No = 38744.572;
+  const Eo = 28001.642;
+  const k0 = 1.0;
+  const b = a * (1 - f);
+  const e2 = 2 * f - f * f;
+  const e4 = e2 * e2;
+  const e6 = e4 * e2;
+  const n = (a - b) / (a + b);
+  const n2 = n * n;
+  const n3 = n2 * n;
+  const n4 = n3 * n;
+  const A0 = a * (1 - n + (5/4)*(n2 - n3) + (81/64)*n4);
+
+  function calcM(lat) {
+    return a * (
+      (1 - e2/4 - 3*e4/64 - 5*e6/256) * lat
+      - (3*e2/8 + 3*e4/32 + 45*e6/1024) * Math.sin(2*lat)
+      + (15*e4/256 + 45*e6/1024) * Math.sin(4*lat)
+      - (35*e6/3072) * Math.sin(6*lat)
+    );
+  }
+
+  function fromLatLon(lat, lon) {
+    const latR = lat * Math.PI / 180;
+    const sinLat = Math.sin(latR);
+    const sin2Lat = sinLat * sinLat;
+    const cosLat = Math.cos(latR);
+    const cos2Lat = cosLat * cosLat;
+    const cos3Lat = cos2Lat * cosLat;
+    const cos5Lat = cos3Lat * cos2Lat;
+    const tanLat = Math.tan(latR);
+    const tan2Lat = tanLat * tanLat;
+    const tan4Lat = tan2Lat * tan2Lat;
+
+    const nu = a / Math.sqrt(1 - e2 * sin2Lat);
+    const rho = a * (1 - e2) / Math.pow(1 - e2 * sin2Lat, 1.5);
+    const psi = nu / rho;
+    const M = calcM(latR);
+    const dLon = (lon - oLon) * Math.PI / 180;
+
+    const T1 = M * k0;
+    const T2 = k0 * nu * sinLat * cosLat / 2;
+    const T3 = k0 * nu * sinLat * cos3Lat * (4*psi*psi + psi - tan2Lat) / 24;
+    const N = No + T1 + T2*dLon*dLon + T3*Math.pow(dLon,4);
+
+    const T5 = k0 * nu * cosLat;
+    const T6 = k0 * nu * cos3Lat * (psi - tan2Lat) / 6;
+    const T7 = k0 * nu * cos5Lat *
+      (4*Math.pow(psi,3)*(1-6*tan2Lat) + psi*psi*(1+8*tan2Lat) - psi*2*tan2Lat + tan4Lat) / 120;
+    const E = Eo + T5*dLon + T6*Math.pow(dLon,3) + T7*Math.pow(dLon,5);
+
+    return { northing: N, easting: E };
+  }
+
+  function toLatLon(northing, easting) {
+    const Np = northing - No;
+    const Mo = calcM(oLat * Math.PI / 180);
+    const Mf = Mo + Np / k0;
+
+    let latF = Mf / A0;
+    for (let i = 0; i < 10; i++) {
+      const Mfc = calcM(latF);
+      const diff = (Mf - Mfc) / A0;
+      latF += diff;
+      if (Math.abs(diff) < 1e-14) break;
+    }
+
+    const sinLatF = Math.sin(latF);
+    const cosLatF = Math.cos(latF);
+    const tanLatF = Math.tan(latF);
+    const tan2LatF = tanLatF * tanLatF;
+    const tan4LatF = tan2LatF * tan2LatF;
+    const sin2LatF = sinLatF * sinLatF;
+    const nuF = a / Math.sqrt(1 - e2 * sin2LatF);
+    const rhoF = a * (1 - e2) / Math.pow(1 - e2 * sin2LatF, 1.5);
+    const psiF = nuF / rhoF;
+
+    const Ep = easting - Eo;
+    const x = Ep / (k0 * nuF);
+    const x2 = x * x;
+    const x3 = x2 * x;
+    const x5 = x3 * x2;
+
+    const latTerm1 = -tanLatF / (k0 * rhoF) * (Ep * x / 2);
+    const latTerm2 = tanLatF / (k0 * rhoF) * (Ep * x3 / 24) *
+      (-4*psiF*psiF + 9*psiF*(1-tan2LatF) + 12*tan2LatF);
+    const lat = (latF + latTerm1 + latTerm2) * 180 / Math.PI;
+
+    const secLatF = 1 / cosLatF;
+    const lonTerm1 = x * secLatF;
+    const lonTerm2 = -x3 * secLatF / 6 * (psiF + 2*tan2LatF);
+    const lonTerm3 = x5 * secLatF / 120 *
+      (-4*Math.pow(psiF,3)*(1-6*tan2LatF) + psiF*psiF*(9-68*tan2LatF) + 72*psiF*tan2LatF + 24*tan4LatF);
+    const lon = oLon + (lonTerm1 + lonTerm2 + lonTerm3) * 180 / Math.PI;
+
+    return { latitude: lat, longitude: lon };
+  }
+
+  return { fromLatLon, toLatLon };
+})();
+
+
+// ========================================
+// App State
+// ========================================
+let currentLat = null, currentLon = null, currentAcc = null;
+let currentSvy21 = null;
+let history = JSON.parse(localStorage.getItem('svy21_history') || '[]');
+let watchId = null;
+
+
+// ========================================
+// Tab Navigation
+// ========================================
+document.querySelectorAll('.tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('page-' + tab.dataset.page).classList.add('active');
+    if (tab.dataset.page === 'history') renderHistory();
+  });
+});
+
+
+// ========================================
+// Toast
+// ========================================
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+
+// ========================================
+// LIVE GPS
+// ========================================
+function startGPS() {
+  if (!navigator.geolocation) {
+    document.getElementById('gpsStatus').textContent = 'Geolocation not supported';
+    return;
+  }
+
+  watchId = navigator.geolocation.watchPosition(
+    (pos) => {
+      currentLat = pos.coords.latitude;
+      currentLon = pos.coords.longitude;
+      currentAcc = pos.coords.accuracy;
+
+      // Convert to SVY21
+      currentSvy21 = SVY21.fromLatLon(currentLat, currentLon);
+
+      // Update UI
+      document.getElementById('gpsDot').classList.add('active');
+      document.getElementById('gpsStatus').textContent = 'GPS Active';
+      document.getElementById('gpsAccuracy').textContent = '±' + currentAcc.toFixed(1) + ' m';
+
+      document.getElementById('liveNorthing').textContent = currentSvy21.northing.toFixed(3) + ' m';
+      document.getElementById('liveEasting').textContent = currentSvy21.easting.toFixed(3) + ' m';
+      document.getElementById('liveLat').textContent = currentLat.toFixed(7) + '°';
+      document.getElementById('liveLon').textContent = currentLon.toFixed(7) + '°';
+
+      // Enable buttons
+      document.getElementById('btnSave').disabled = false;
+      document.getElementById('btnCopy').disabled = false;
+      document.getElementById('btnShare').disabled = false;
+      document.getElementById('btnMapCurrent').disabled = false;
+    },
+    (err) => {
+      document.getElementById('gpsStatus').textContent = 'GPS Error: ' + err.message;
+    },
+    { enableHighAccuracy: true, maximumAge: 1000, timeout: 10000 }
+  );
+}
+
+// Save point
+document.getElementById('btnSave').addEventListener('click', () => {
+  if (!currentSvy21) return;
+  const entry = {
+    id: Date.now(),
+    timestamp: Date.now(),
+    lat: currentLat,
+    lon: currentLon,
+    northing: currentSvy21.northing,
+    easting: currentSvy21.easting,
+    accuracy: currentAcc
+  };
+  history.unshift(entry);
+  localStorage.setItem('svy21_history', JSON.stringify(history));
+  showToast('Saved! (' + history.length + ' points stored)');
+});
+
+// Copy
+document.getElementById('btnCopy').addEventListener('click', () => {
+  if (!currentSvy21) return;
+  const text = `SVY21 Coordinates:\nNorthing: ${currentSvy21.northing.toFixed(3)} m\nEasting: ${currentSvy21.easting.toFixed(3)} m\n\nWGS84 Coordinates:\nLat: ${currentLat.toFixed(7)}\nLon: ${currentLon.toFixed(7)}\nAccuracy: ${currentAcc.toFixed(1)} m`;
+  navigator.clipboard.writeText(text).then(() => showToast('Coordinates copied!'));
+});
+
+// Share
+document.getElementById('btnShare').addEventListener('click', () => {
+  if (!currentSvy21) return;
+  const text = `SVY21 Coordinates\nN: ${currentSvy21.northing.toFixed(3)} m\nE: ${currentSvy21.easting.toFixed(3)} m\n(WGS84: ${currentLat.toFixed(7)}, ${currentLon.toFixed(7)})\nAccuracy: ±${currentAcc.toFixed(1)} m`;
+  if (navigator.share) {
+    navigator.share({ title: 'SVY21 Coordinates', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => showToast('Copied to clipboard'));
+  }
+});
+
+// Open current in Maps
+document.getElementById('btnMapCurrent').addEventListener('click', () => {
+  if (!currentLat) return;
+  openGoogleMaps(currentLat, currentLon, `SVY21 N:${currentSvy21.northing.toFixed(1)} E:${currentSvy21.easting.toFixed(1)}`);
+});
+
+
+// ========================================
+// GO TO LOCATION
+// ========================================
+const inputN = document.getElementById('inputN');
+const inputE = document.getElementById('inputE');
+
+function livePreview() {
+  const n = parseFloat(inputN.value);
+  const e = parseFloat(inputE.value);
+  const preview = document.getElementById('gotoPreview');
+  if (!isNaN(n) && !isNaN(e)) {
+    const ll = SVY21.toLatLon(n, e);
+    document.getElementById('gotoPreviewText').textContent =
+      'Lat: ' + ll.latitude.toFixed(7) + '°  Lon: ' + ll.longitude.toFixed(7) + '°';
+    preview.classList.add('visible');
+    return ll;
+  }
+  preview.classList.remove('visible');
+  return null;
+}
+
+inputN.addEventListener('input', livePreview);
+inputE.addEventListener('input', livePreview);
+
+document.getElementById('btnPreview').addEventListener('click', () => {
+  const ll = livePreview();
+  if (!ll) showToast('Enter both Northing and Easting');
+  else {
+    // Range warning
+    const n = parseFloat(inputN.value);
+    const e = parseFloat(inputE.value);
+    if (n < 0 || n > 60000 || e < 0 || e > 60000) {
+      showToast('Values may be outside Singapore SVY21 range');
+    }
+  }
+});
+
+document.getElementById('btnOpenMap').addEventListener('click', () => {
+  const n = parseFloat(inputN.value);
+  const e = parseFloat(inputE.value);
+  if (isNaN(n) || isNaN(e)) {
+    showToast('Enter valid SVY21 coordinates first');
+    return;
+  }
+  const ll = SVY21.toLatLon(n, e);
+  openGoogleMaps(ll.latitude, ll.longitude, `SVY21 N:${n.toFixed(1)} E:${e.toFixed(1)}`);
+});
+
+document.getElementById('btnImportHistory').addEventListener('click', () => {
+  if (history.length === 0) {
+    showToast('No saved coordinates yet');
+    return;
+  }
+  // Build a simple picker
+  const items = history.map((h, i) => {
+    const d = new Date(h.timestamp);
+    return `${i+1}. N:${h.northing.toFixed(1)}  E:${h.easting.toFixed(1)}  (${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})})`;
+  });
+
+  const choice = prompt('Select a point (enter number 1-' + history.length + '):\n\n' + items.join('\n'));
+  if (choice) {
+    const idx = parseInt(choice) - 1;
+    if (idx >= 0 && idx < history.length) {
+      inputN.value = history[idx].northing.toFixed(3);
+      inputE.value = history[idx].easting.toFixed(3);
+      livePreview();
+      showToast('Point loaded');
+    }
+  }
+});
+
+
+// ========================================
+// HISTORY
+// ========================================
+function renderHistory() {
+  const container = document.getElementById('historyList');
+  if (history.length === 0) {
+    container.innerHTML = '<div class="empty-state">No saved coordinates yet.<br>Tap "Save Point" on the Live GPS tab to start recording.</div>';
+    return;
+  }
+
+  container.innerHTML = history.map((h, i) => {
+    const d = new Date(h.timestamp);
+    const dateStr = d.toLocaleDateString('en-SG', { day:'2-digit', month:'short' });
+    const timeStr = d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    return `
+      <div class="history-item" data-idx="${i}">
+        <div class="history-num">${i + 1}</div>
+        <div class="history-coords">
+          <div class="history-svy21">N: ${h.northing.toFixed(3)}  E: ${h.easting.toFixed(3)}</div>
+          <div class="history-wgs84">${h.lat.toFixed(7)}, ${h.lon.toFixed(7)} (±${h.accuracy.toFixed(1)}m)</div>
+        </div>
+        <div class="history-time">${dateStr}<br>${timeStr}</div>
+        <div class="history-actions">
+          <button onclick="event.stopPropagation(); goToHistoryPoint(${i})" title="Open in Maps">📍</button>
+          <button onclick="event.stopPropagation(); deleteHistoryPoint(${i})" title="Delete">🗑</button>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  // Tap history item to use in Go To Location
+  container.querySelectorAll('.history-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const idx = parseInt(item.dataset.idx);
+      inputN.value = history[idx].northing.toFixed(3);
+      inputE.value = history[idx].easting.toFixed(3);
+      // Switch to Go To Location tab
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+      document.querySelector('[data-page="goto"]').classList.add('active');
+      document.getElementById('page-goto').classList.add('active');
+      livePreview();
+      showToast('Point loaded — tap Open in Maps');
+    });
+  });
+}
+
+function goToHistoryPoint(idx) {
+  const h = history[idx];
+  openGoogleMaps(h.lat, h.lon, `SVY21 N:${h.northing.toFixed(1)} E:${h.easting.toFixed(1)}`);
+}
+
+function deleteHistoryPoint(idx) {
+  if (confirm('Delete this point?')) {
+    history.splice(idx, 1);
+    localStorage.setItem('svy21_history', JSON.stringify(history));
+    renderHistory();
+    showToast('Point deleted');
+  }
+}
+
+// Clear all
+document.getElementById('btnClearHistory').addEventListener('click', () => {
+  if (history.length === 0) return;
+  if (confirm('Delete all ' + history.length + ' saved coordinates? This cannot be undone.')) {
+    history = [];
+    localStorage.setItem('svy21_history', JSON.stringify(history));
+    renderHistory();
+    showToast('History cleared');
+  }
+});
+
+// Export CSV
+document.getElementById('btnExportCsv').addEventListener('click', () => {
+  if (history.length === 0) {
+    showToast('No saved coordinates to export');
+    return;
+  }
+
+  let csv = 'Timestamp,Northing_m,Easting_m,Latitude,Longitude,Accuracy_m\n';
+  history.forEach(h => {
+    const d = new Date(h.timestamp);
+    csv += `${d.toISOString()},${h.northing.toFixed(3)},${h.easting.toFixed(3)},${h.lat.toFixed(7)},${h.lon.toFixed(7)},${h.accuracy.toFixed(1)}\n`;
+  });
+
+  const blob = new Blob([csv], { type: 'text/csv' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'SVY21_Export_' + new Date().toISOString().slice(0,10) + '.csv';
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('CSV downloaded (' + history.length + ' points)');
+});
+
+
+// ========================================
+// Google Maps Launcher
+// ========================================
+function openGoogleMaps(lat, lon, label) {
+  // This URL format works on both mobile (opens Google Maps app) and desktop (opens browser)
+  const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
+  window.open(url, '_blank');
+}
+
+
+// ========================================
+// Initialize
+// ========================================
+startGPS();
+</script>
+
+</body>
+</html>
