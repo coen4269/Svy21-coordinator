@@ -31,7 +31,6 @@
     padding-bottom: 80px;
   }
 
-  /* Header */
   .header {
     background: var(--primary);
     color: white;
@@ -44,7 +43,6 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.15);
   }
 
-  /* Tabs */
   .tabs {
     display: flex;
     background: var(--primary-dark);
@@ -68,11 +66,9 @@
     border-bottom-color: var(--accent);
   }
 
-  /* Pages */
   .page { display: none; padding: 16px; }
   .page.active { display: block; }
 
-  /* Cards */
   .card {
     background: var(--card);
     border-radius: 12px;
@@ -91,7 +87,6 @@
     color: var(--text2);
   }
 
-  /* GPS status */
   .status-row {
     display: flex;
     align-items: center;
@@ -111,7 +106,6 @@
   .status-text { flex: 1; font-size: 14px; color: var(--text2); }
   .accuracy-text { font-size: 13px; color: var(--text2); }
 
-  /* Coordinate display */
   .coord-label {
     font-size: 11px;
     color: var(--text2);
@@ -137,7 +131,6 @@
   }
   .wgs84-row > div { flex: 1; }
 
-  /* Buttons */
   .btn-row {
     display: flex;
     gap: 8px;
@@ -159,32 +152,13 @@
     -webkit-tap-highlight-color: transparent;
   }
   .btn:active { transform: scale(0.97); }
-  .btn-primary {
-    background: var(--primary);
-    color: white;
-  }
-  .btn-accent {
-    background: var(--accent);
-    color: white;
-  }
-  .btn-outline {
-    background: white;
-    color: var(--primary);
-    border: 2px solid var(--primary);
-  }
-  .btn-text {
-    background: transparent;
-    color: var(--primary);
-  }
-  .btn:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-  }
+  .btn-primary { background: var(--primary); color: white; }
+  .btn-accent { background: var(--accent); color: white; }
+  .btn-outline { background: white; color: var(--primary); border: 2px solid var(--primary); }
+  .btn-text { background: transparent; color: var(--primary); }
+  .btn:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* Input fields */
-  .input-group {
-    margin-bottom: 14px;
-  }
+  .input-group { margin-bottom: 14px; }
   .input-group label {
     display: block;
     font-size: 13px;
@@ -192,7 +166,7 @@
     margin-bottom: 4px;
     font-weight: 500;
   }
-  .input-group input {
+  .input-group input, .input-group select {
     width: 100%;
     padding: 14px;
     border: 2px solid var(--border);
@@ -202,13 +176,14 @@
     outline: none;
     transition: border-color 0.2s;
     -webkit-appearance: none;
+    background: white;
   }
-  .input-group input:focus {
-    border-color: var(--primary);
+  .input-group input:focus { border-color: var(--primary); }
+  .input-group input.point-id-input {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 16px;
   }
-  .input-suffix {
-    position: relative;
-  }
+  .input-suffix { position: relative; }
   .input-suffix::after {
     content: 'm';
     position: absolute;
@@ -220,7 +195,6 @@
     pointer-events: none;
   }
 
-  /* Preview box */
   .preview-box {
     background: #E8F5E9;
     border-radius: 8px;
@@ -242,7 +216,6 @@
     margin-top: 4px;
   }
 
-  /* Reference box */
   .ref-box {
     background: #FFF8E1;
     border-radius: 8px;
@@ -253,13 +226,12 @@
   }
   .ref-box strong { color: var(--text); }
 
-  /* History list */
   .history-item {
     display: flex;
     align-items: center;
     padding: 12px;
     border-bottom: 1px solid var(--border);
-    gap: 12px;
+    gap: 10px;
     cursor: pointer;
     transition: background 0.15s;
   }
@@ -277,9 +249,12 @@
     font-weight: 700;
     flex-shrink: 0;
   }
-  .history-coords {
-    flex: 1;
-    min-width: 0;
+  .history-coords { flex: 1; min-width: 0; }
+  .history-id {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 1px;
   }
   .history-svy21 {
     font-size: 14px;
@@ -320,7 +295,41 @@
     line-height: 1.6;
   }
 
-  /* Toast */
+  /* CSV import table */
+  .csv-table-wrap {
+    max-height: 300px;
+    overflow-y: auto;
+    margin-bottom: 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+  .csv-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .csv-table th {
+    background: var(--primary);
+    color: white;
+    padding: 8px 6px;
+    text-align: left;
+    position: sticky;
+    top: 0;
+    font-size: 11px;
+  }
+  .csv-table td {
+    padding: 8px 6px;
+    border-bottom: 1px solid var(--border);
+    font-family: monospace;
+    font-size: 12px;
+  }
+  .csv-table tr:nth-child(even) { background: #FAFAFA; }
+  .csv-table tr.selected { background: #E3F2FD; }
+  .csv-table tr:active { background: #BBDEFB; }
+
+  /* Hidden file input */
+  .file-input-hidden { display: none; }
+
   .toast {
     position: fixed;
     bottom: 90px;
@@ -357,7 +366,6 @@
 <!-- ===== LIVE GPS PAGE ===== -->
 <div class="page active" id="page-live">
 
-  <!-- GPS Status -->
   <div class="card">
     <div class="status-row">
       <div class="status-dot" id="gpsDot"></div>
@@ -366,7 +374,6 @@
     </div>
   </div>
 
-  <!-- SVY21 Coordinates -->
   <div class="card">
     <div class="card-title">SVY21 Coordinates</div>
     <div class="coord-label">NORTHING (N)</div>
@@ -375,7 +382,6 @@
     <div class="coord-value" id="liveEasting">—</div>
   </div>
 
-  <!-- WGS84 -->
   <div class="card">
     <div class="card-title secondary">WGS84 Coordinates</div>
     <div class="wgs84-row">
@@ -390,7 +396,14 @@
     </div>
   </div>
 
-  <!-- Action Buttons -->
+  <!-- Point ID Input -->
+  <div class="card">
+    <div class="input-group" style="margin-bottom:0">
+      <label>Point ID (optional)</label>
+      <input type="text" id="inputPointId" class="point-id-input" placeholder="e.g. BM-01, CP-A, Survey Point 1">
+    </div>
+  </div>
+
   <div class="btn-row">
     <button class="btn btn-primary" id="btnSave" disabled>Save Point</button>
     <button class="btn btn-outline" id="btnCopy" disabled>Copy</button>
@@ -432,6 +445,18 @@
     </div>
   </div>
 
+  <!-- Import from CSV -->
+  <div class="card">
+    <div class="card-title secondary">Import from CSV</div>
+    <p style="font-size:13px; color:var(--text2); margin-bottom:12px;">
+      CSV must have columns for Northing and Easting. Optional: Point ID column.
+    </p>
+    <input type="file" id="csvFileInput" class="file-input-hidden" accept=".csv,.txt">
+    <button class="btn btn-outline" id="btnLoadCsv" style="width:100%; margin-bottom:8px;">Load CSV File</button>
+    <div id="csvPreviewArea"></div>
+  </div>
+
+  <!-- Import from History -->
   <div class="card">
     <div class="card-title secondary">Or Import from History</div>
     <button class="btn btn-outline" id="btnImportHistory" style="width:100%">Select from Saved Points</button>
@@ -462,21 +487,20 @@
   </div>
 </div>
 
-<!-- Toast -->
 <div class="toast" id="toast"></div>
 
 <script>
 // ========================================
-// SVY21 Conversion Library
+// SVY21 Conversion Library (FIXED)
 // ========================================
 const SVY21 = (() => {
   const a = 6378137.0;
   const f = 1 / 298.257223563;
-  const oLat = 1.366666666666667;
-  const oLon = 103.833333333333333;
-  const No = 38744.572;
-  const Eo = 28001.642;
-  const k0 = 1.0;
+  const oLat = 1.366666666666667;   // Origin latitude in degrees
+  const oLon = 103.833333333333333;  // Origin longitude in degrees
+  const No = 38744.572;              // False Northing
+  const Eo = 28001.642;              // False Easting
+  const k0 = 1.0;                    // Scale factor
   const b = a * (1 - f);
   const e2 = 2 * f - f * f;
   const e4 = e2 * e2;
@@ -487,6 +511,7 @@ const SVY21 = (() => {
   const n4 = n3 * n;
   const A0 = a * (1 - n + (5/4)*(n2 - n3) + (81/64)*n4);
 
+  // Meridian distance from equator to latitude (radians)
   function calcM(lat) {
     return a * (
       (1 - e2/4 - 3*e4/64 - 5*e6/256) * lat
@@ -495,6 +520,10 @@ const SVY21 = (() => {
       - (35*e6/3072) * Math.sin(6*lat)
     );
   }
+
+  // Pre-compute meridian distance at origin latitude
+  const oLatR = oLat * Math.PI / 180;
+  const M0 = calcM(oLatR);
 
   function fromLatLon(lat, lon) {
     const latR = lat * Math.PI / 180;
@@ -511,13 +540,18 @@ const SVY21 = (() => {
     const nu = a / Math.sqrt(1 - e2 * sin2Lat);
     const rho = a * (1 - e2) / Math.pow(1 - e2 * sin2Lat, 1.5);
     const psi = nu / rho;
+
+    // FIX: Subtract meridian distance at origin (M0)
     const M = calcM(latR);
     const dLon = (lon - oLon) * Math.PI / 180;
 
-    const T1 = M * k0;
+    const T1 = (M - M0) * k0;
     const T2 = k0 * nu * sinLat * cosLat / 2;
     const T3 = k0 * nu * sinLat * cos3Lat * (4*psi*psi + psi - tan2Lat) / 24;
-    const N = No + T1 + T2*dLon*dLon + T3*Math.pow(dLon,4);
+    const T4 = k0 * nu * sinLat * cos5Lat *
+      (8*Math.pow(psi,4)*(11-24*tan2Lat) - 28*Math.pow(psi,3)*(1-6*tan2Lat) +
+       psi*psi*(1-32*tan2Lat) - psi*2*tan2Lat + tan4Lat) / 720;
+    const N = No + T1 + T2*dLon*dLon + T3*Math.pow(dLon,4) + T4*Math.pow(dLon,6);
 
     const T5 = k0 * nu * cosLat;
     const T6 = k0 * nu * cos3Lat * (psi - tan2Lat) / 6;
@@ -530,11 +564,11 @@ const SVY21 = (() => {
 
   function toLatLon(northing, easting) {
     const Np = northing - No;
-    const Mo = calcM(oLat * Math.PI / 180);
-    const Mf = Mo + Np / k0;
+    const Mf = M0 + Np / k0;
 
+    // Iteratively solve for footprint latitude
     let latF = Mf / A0;
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 20; i++) {
       const Mfc = calcM(latF);
       const diff = (Mf - Mfc) / A0;
       latF += diff;
@@ -582,6 +616,7 @@ const SVY21 = (() => {
 let currentLat = null, currentLon = null, currentAcc = null;
 let currentSvy21 = null;
 let history = JSON.parse(localStorage.getItem('svy21_history') || '[]');
+let csvData = []; // Imported CSV points
 let watchId = null;
 
 
@@ -625,20 +660,17 @@ function startGPS() {
       currentLon = pos.coords.longitude;
       currentAcc = pos.coords.accuracy;
 
-      // Convert to SVY21
       currentSvy21 = SVY21.fromLatLon(currentLat, currentLon);
 
-      // Update UI
       document.getElementById('gpsDot').classList.add('active');
       document.getElementById('gpsStatus').textContent = 'GPS Active';
-      document.getElementById('gpsAccuracy').textContent = '±' + currentAcc.toFixed(1) + ' m';
+      document.getElementById('gpsAccuracy').textContent = '\u00B1' + currentAcc.toFixed(1) + ' m';
 
       document.getElementById('liveNorthing').textContent = currentSvy21.northing.toFixed(3) + ' m';
       document.getElementById('liveEasting').textContent = currentSvy21.easting.toFixed(3) + ' m';
-      document.getElementById('liveLat').textContent = currentLat.toFixed(7) + '°';
-      document.getElementById('liveLon').textContent = currentLon.toFixed(7) + '°';
+      document.getElementById('liveLat').textContent = currentLat.toFixed(7) + '\u00B0';
+      document.getElementById('liveLon').textContent = currentLon.toFixed(7) + '\u00B0';
 
-      // Enable buttons
       document.getElementById('btnSave').disabled = false;
       document.getElementById('btnCopy').disabled = false;
       document.getElementById('btnShare').disabled = false;
@@ -651,11 +683,13 @@ function startGPS() {
   );
 }
 
-// Save point
+// Save point (now with Point ID)
 document.getElementById('btnSave').addEventListener('click', () => {
   if (!currentSvy21) return;
+  const pointId = document.getElementById('inputPointId').value.trim();
   const entry = {
     id: Date.now(),
+    pointId: pointId || '',
     timestamp: Date.now(),
     lat: currentLat,
     lon: currentLon,
@@ -665,20 +699,33 @@ document.getElementById('btnSave').addEventListener('click', () => {
   };
   history.unshift(entry);
   localStorage.setItem('svy21_history', JSON.stringify(history));
-  showToast('Saved! (' + history.length + ' points stored)');
+  const label = pointId ? '"' + pointId + '" saved!' : 'Saved!';
+  showToast(label + ' (' + history.length + ' points stored)');
+  // Auto-increment point ID if it ends with a number
+  const match = pointId.match(/^(.*?)(\d+)$/);
+  if (match) {
+    const prefix = match[1];
+    const num = parseInt(match[2]) + 1;
+    const padded = String(num).padStart(match[2].length, '0');
+    document.getElementById('inputPointId').value = prefix + padded;
+  }
 });
 
 // Copy
 document.getElementById('btnCopy').addEventListener('click', () => {
   if (!currentSvy21) return;
-  const text = `SVY21 Coordinates:\nNorthing: ${currentSvy21.northing.toFixed(3)} m\nEasting: ${currentSvy21.easting.toFixed(3)} m\n\nWGS84 Coordinates:\nLat: ${currentLat.toFixed(7)}\nLon: ${currentLon.toFixed(7)}\nAccuracy: ${currentAcc.toFixed(1)} m`;
+  const pointId = document.getElementById('inputPointId').value.trim();
+  const idLine = pointId ? 'Point ID: ' + pointId + '\n' : '';
+  const text = `${idLine}SVY21 Coordinates:\nNorthing: ${currentSvy21.northing.toFixed(3)} m\nEasting: ${currentSvy21.easting.toFixed(3)} m\n\nWGS84 Coordinates:\nLat: ${currentLat.toFixed(7)}\nLon: ${currentLon.toFixed(7)}\nAccuracy: ${currentAcc.toFixed(1)} m`;
   navigator.clipboard.writeText(text).then(() => showToast('Coordinates copied!'));
 });
 
 // Share
 document.getElementById('btnShare').addEventListener('click', () => {
   if (!currentSvy21) return;
-  const text = `SVY21 Coordinates\nN: ${currentSvy21.northing.toFixed(3)} m\nE: ${currentSvy21.easting.toFixed(3)} m\n(WGS84: ${currentLat.toFixed(7)}, ${currentLon.toFixed(7)})\nAccuracy: ±${currentAcc.toFixed(1)} m`;
+  const pointId = document.getElementById('inputPointId').value.trim();
+  const idLine = pointId ? 'Point: ' + pointId + '\n' : '';
+  const text = `${idLine}SVY21 Coordinates\nN: ${currentSvy21.northing.toFixed(3)} m\nE: ${currentSvy21.easting.toFixed(3)} m\n(WGS84: ${currentLat.toFixed(7)}, ${currentLon.toFixed(7)})\nAccuracy: \u00B1${currentAcc.toFixed(1)} m`;
   if (navigator.share) {
     navigator.share({ title: 'SVY21 Coordinates', text });
   } else {
@@ -689,7 +736,7 @@ document.getElementById('btnShare').addEventListener('click', () => {
 // Open current in Maps
 document.getElementById('btnMapCurrent').addEventListener('click', () => {
   if (!currentLat) return;
-  openGoogleMaps(currentLat, currentLon, `SVY21 N:${currentSvy21.northing.toFixed(1)} E:${currentSvy21.easting.toFixed(1)}`);
+  openGoogleMaps(currentLat, currentLon);
 });
 
 
@@ -706,7 +753,7 @@ function livePreview() {
   if (!isNaN(n) && !isNaN(e)) {
     const ll = SVY21.toLatLon(n, e);
     document.getElementById('gotoPreviewText').textContent =
-      'Lat: ' + ll.latitude.toFixed(7) + '°  Lon: ' + ll.longitude.toFixed(7) + '°';
+      'Lat: ' + ll.latitude.toFixed(7) + '\u00B0  Lon: ' + ll.longitude.toFixed(7) + '\u00B0';
     preview.classList.add('visible');
     return ll;
   }
@@ -721,7 +768,6 @@ document.getElementById('btnPreview').addEventListener('click', () => {
   const ll = livePreview();
   if (!ll) showToast('Enter both Northing and Easting');
   else {
-    // Range warning
     const n = parseFloat(inputN.value);
     const e = parseFloat(inputE.value);
     if (n < 0 || n > 60000 || e < 0 || e > 60000) {
@@ -738,20 +784,20 @@ document.getElementById('btnOpenMap').addEventListener('click', () => {
     return;
   }
   const ll = SVY21.toLatLon(n, e);
-  openGoogleMaps(ll.latitude, ll.longitude, `SVY21 N:${n.toFixed(1)} E:${e.toFixed(1)}`);
+  openGoogleMaps(ll.latitude, ll.longitude);
 });
 
+// Import from history
 document.getElementById('btnImportHistory').addEventListener('click', () => {
   if (history.length === 0) {
     showToast('No saved coordinates yet');
     return;
   }
-  // Build a simple picker
   const items = history.map((h, i) => {
     const d = new Date(h.timestamp);
-    return `${i+1}. N:${h.northing.toFixed(1)}  E:${h.easting.toFixed(1)}  (${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})})`;
+    const label = h.pointId ? '[' + h.pointId + '] ' : '';
+    return `${i+1}. ${label}N:${h.northing.toFixed(1)}  E:${h.easting.toFixed(1)}  (${d.toLocaleDateString()} ${d.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'})})`;
   });
-
   const choice = prompt('Select a point (enter number 1-' + history.length + '):\n\n' + items.join('\n'));
   if (choice) {
     const idx = parseInt(choice) - 1;
@@ -763,6 +809,121 @@ document.getElementById('btnImportHistory').addEventListener('click', () => {
     }
   }
 });
+
+
+// ========================================
+// CSV IMPORT
+// ========================================
+document.getElementById('btnLoadCsv').addEventListener('click', () => {
+  document.getElementById('csvFileInput').click();
+});
+
+document.getElementById('csvFileInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    const text = evt.target.result;
+    parseCsvAndDisplay(text);
+  };
+  reader.readAsText(file);
+  // Reset so same file can be re-selected
+  e.target.value = '';
+});
+
+function parseCsvAndDisplay(text) {
+  const lines = text.trim().split(/\r?\n/);
+  if (lines.length < 2) {
+    showToast('CSV file is empty or has no data rows');
+    return;
+  }
+
+  const headerLine = lines[0];
+  const sep = headerLine.includes('\t') ? '\t' : ',';
+  const headers = headerLine.split(sep).map(h => h.trim().toLowerCase().replace(/['"]/g, ''));
+
+  // Find Northing and Easting columns (flexible matching)
+  let nCol = headers.findIndex(h => h.match(/north/i));
+  let eCol = headers.findIndex(h => h.match(/east/i));
+
+  // Also try N and E
+  if (nCol === -1) nCol = headers.findIndex(h => h === 'n' || h === 'y');
+  if (eCol === -1) eCol = headers.findIndex(h => h === 'e' || h === 'x');
+
+  // Try Northing_m, Easting_m
+  if (nCol === -1) nCol = headers.findIndex(h => h.includes('northing'));
+  if (eCol === -1) eCol = headers.findIndex(h => h.includes('easting'));
+
+  if (nCol === -1 || eCol === -1) {
+    showToast('Cannot find Northing/Easting columns in CSV');
+    return;
+  }
+
+  // Look for Point ID column
+  let idCol = headers.findIndex(h => h.match(/point.*id|id|name|label|point|description|desc|pt/i));
+
+  csvData = [];
+  for (let i = 1; i < lines.length; i++) {
+    const cols = lines[i].split(sep).map(c => c.trim().replace(/['"]/g, ''));
+    const northing = parseFloat(cols[nCol]);
+    const easting = parseFloat(cols[eCol]);
+    if (isNaN(northing) || isNaN(easting)) continue;
+    const pointId = idCol >= 0 ? cols[idCol] || '' : '';
+    const ll = SVY21.toLatLon(northing, easting);
+    csvData.push({ pointId, northing, easting, lat: ll.latitude, lon: ll.longitude });
+  }
+
+  if (csvData.length === 0) {
+    showToast('No valid coordinate rows found in CSV');
+    return;
+  }
+
+  showToast(csvData.length + ' points loaded from CSV');
+  renderCsvTable();
+}
+
+function renderCsvTable() {
+  const area = document.getElementById('csvPreviewArea');
+  let html = '<div class="csv-table-wrap"><table class="csv-table">';
+  html += '<tr><th>#</th><th>Point ID</th><th>Northing</th><th>Easting</th><th>Action</th></tr>';
+
+  csvData.forEach((pt, i) => {
+    html += `<tr>
+      <td>${i + 1}</td>
+      <td>${pt.pointId || '—'}</td>
+      <td>${pt.northing.toFixed(3)}</td>
+      <td>${pt.easting.toFixed(3)}</td>
+      <td>
+        <button onclick="useCsvPoint(${i})" style="background:var(--primary);color:white;border:none;border-radius:4px;padding:6px 10px;font-size:11px;cursor:pointer;">Use</button>
+        <button onclick="openCsvPointMap(${i})" style="background:var(--accent);color:white;border:none;border-radius:4px;padding:6px 10px;font-size:11px;cursor:pointer;margin-left:4px;">Map</button>
+      </td>
+    </tr>`;
+  });
+
+  html += '</table></div>';
+  html += '<button class="btn btn-text" onclick="clearCsvData()" style="width:100%;font-size:13px;">Clear imported data</button>';
+  area.innerHTML = html;
+}
+
+function useCsvPoint(idx) {
+  const pt = csvData[idx];
+  inputN.value = pt.northing.toFixed(3);
+  inputE.value = pt.easting.toFixed(3);
+  livePreview();
+  showToast((pt.pointId || 'Point') + ' loaded');
+}
+
+function openCsvPointMap(idx) {
+  const pt = csvData[idx];
+  openGoogleMaps(pt.lat, pt.lon);
+}
+
+function clearCsvData() {
+  csvData = [];
+  document.getElementById('csvPreviewArea').innerHTML = '';
+  showToast('CSV data cleared');
+}
 
 
 // ========================================
@@ -779,42 +940,42 @@ function renderHistory() {
     const d = new Date(h.timestamp);
     const dateStr = d.toLocaleDateString('en-SG', { day:'2-digit', month:'short' });
     const timeStr = d.toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+    const idHtml = h.pointId ? '<div class="history-id">' + h.pointId + '</div>' : '';
     return `
       <div class="history-item" data-idx="${i}">
         <div class="history-num">${i + 1}</div>
         <div class="history-coords">
+          ${idHtml}
           <div class="history-svy21">N: ${h.northing.toFixed(3)}  E: ${h.easting.toFixed(3)}</div>
-          <div class="history-wgs84">${h.lat.toFixed(7)}, ${h.lon.toFixed(7)} (±${h.accuracy.toFixed(1)}m)</div>
+          <div class="history-wgs84">${h.lat.toFixed(7)}, ${h.lon.toFixed(7)} (\u00B1${h.accuracy.toFixed(1)}m)</div>
         </div>
         <div class="history-time">${dateStr}<br>${timeStr}</div>
         <div class="history-actions">
-          <button onclick="event.stopPropagation(); goToHistoryPoint(${i})" title="Open in Maps">📍</button>
-          <button onclick="event.stopPropagation(); deleteHistoryPoint(${i})" title="Delete">🗑</button>
+          <button onclick="event.stopPropagation(); goToHistoryPoint(${i})" title="Open in Maps">\uD83D\uDCCD</button>
+          <button onclick="event.stopPropagation(); deleteHistoryPoint(${i})" title="Delete">\uD83D\uDDD1</button>
         </div>
       </div>
     `;
   }).join('');
 
-  // Tap history item to use in Go To Location
   container.querySelectorAll('.history-item').forEach(item => {
     item.addEventListener('click', () => {
       const idx = parseInt(item.dataset.idx);
       inputN.value = history[idx].northing.toFixed(3);
       inputE.value = history[idx].easting.toFixed(3);
-      // Switch to Go To Location tab
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
       document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
       document.querySelector('[data-page="goto"]').classList.add('active');
       document.getElementById('page-goto').classList.add('active');
       livePreview();
-      showToast('Point loaded — tap Open in Maps');
+      showToast('Point loaded \u2014 tap Open in Maps');
     });
   });
 }
 
 function goToHistoryPoint(idx) {
   const h = history[idx];
-  openGoogleMaps(h.lat, h.lon, `SVY21 N:${h.northing.toFixed(1)} E:${h.easting.toFixed(1)}`);
+  openGoogleMaps(h.lat, h.lon);
 }
 
 function deleteHistoryPoint(idx) {
@@ -826,7 +987,6 @@ function deleteHistoryPoint(idx) {
   }
 }
 
-// Clear all
 document.getElementById('btnClearHistory').addEventListener('click', () => {
   if (history.length === 0) return;
   if (confirm('Delete all ' + history.length + ' saved coordinates? This cannot be undone.')) {
@@ -837,17 +997,17 @@ document.getElementById('btnClearHistory').addEventListener('click', () => {
   }
 });
 
-// Export CSV
+// Export CSV (now includes Point ID)
 document.getElementById('btnExportCsv').addEventListener('click', () => {
   if (history.length === 0) {
     showToast('No saved coordinates to export');
     return;
   }
 
-  let csv = 'Timestamp,Northing_m,Easting_m,Latitude,Longitude,Accuracy_m\n';
+  let csv = 'PointID,Timestamp,Northing_m,Easting_m,Latitude,Longitude,Accuracy_m\n';
   history.forEach(h => {
     const d = new Date(h.timestamp);
-    csv += `${d.toISOString()},${h.northing.toFixed(3)},${h.easting.toFixed(3)},${h.lat.toFixed(7)},${h.lon.toFixed(7)},${h.accuracy.toFixed(1)}\n`;
+    csv += `${h.pointId || ''},${d.toISOString()},${h.northing.toFixed(3)},${h.easting.toFixed(3)},${h.lat.toFixed(7)},${h.lon.toFixed(7)},${h.accuracy.toFixed(1)}\n`;
   });
 
   const blob = new Blob([csv], { type: 'text/csv' });
@@ -864,8 +1024,7 @@ document.getElementById('btnExportCsv').addEventListener('click', () => {
 // ========================================
 // Google Maps Launcher
 // ========================================
-function openGoogleMaps(lat, lon, label) {
-  // This URL format works on both mobile (opens Google Maps app) and desktop (opens browser)
+function openGoogleMaps(lat, lon) {
   const url = `https://www.google.com/maps/search/?api=1&query=${lat},${lon}`;
   window.open(url, '_blank');
 }
